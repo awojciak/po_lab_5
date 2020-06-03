@@ -35,4 +35,31 @@ public class ProductTest {
         // then
         assertBigDecimalCompareValue(product.getPrice(), PRICE);
     }
+
+    @Test
+    public void testSettingDiscount() throws Exception {
+        //given
+
+        // when
+        Product product = new Product(NAME, PRICE);
+        BigDecimal discount = BigDecimal.valueOf(0.911);
+        product.setDiscount(discount);
+
+        // then
+        assertBigDecimalCompareValue(product.getDiscount(), discount);
+    }
+
+    @Test
+    public void testProductPriceWhenDiscount() throws Exception {
+        //given
+
+        // when
+        Product product = new Product(NAME, PRICE);
+        BigDecimal discount = BigDecimal.valueOf(0.911);
+        product.setDiscount(discount);
+        BigDecimal expectedPrice = PRICE.subtract(PRICE.multiply(discount));
+
+        // then
+        assertBigDecimalCompareValue(product.getPrice(), expectedPrice);
+    }
 }

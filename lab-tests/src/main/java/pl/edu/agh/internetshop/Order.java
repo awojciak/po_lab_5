@@ -1,20 +1,26 @@
 package pl.edu.agh.internetshop;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 
 public class Order {
-    private static final BigDecimal TAX_VALUE = BigDecimal.valueOf(1.22);
+    private static final BigDecimal TAX_VALUE = BigDecimal.valueOf(1.23);
 	private final UUID id;
-    private final Product product;
+    private final List<Product> products;
     private boolean paid;
     private Shipment shipment;
     private ShipmentMethod shipmentMethod;
     private PaymentMethod paymentMethod;
+    private BigDecimal discount = BigDecimal.valueOf(0.0);
 
-    public Order(Product product) {
-        this.product = product;
+    public Order(List<Product> products) {
+        if(products == null || products.isEmpty()) {
+            throw new IllegalArgumentException("Lista musi zawierać przynajmniej jeden produkt");
+        }
+
+        this.products = products;
         id = UUID.randomUUID();
         paid = false;
     }
@@ -42,15 +48,21 @@ public class Order {
     }
 
     public BigDecimal getPrice() {
-        return product.getPrice();
+        BigDecimal price = BigDecimal.valueOf(0.0);
+
+        for(Product product : this.products) {
+            price = price.add(product.getPrice());
+        }
+
+        return price.subtract(price.multiply(discount));
     }
 
     public BigDecimal getPriceWithTaxes() {
         return getPrice().multiply(TAX_VALUE).setScale(Product.PRICE_PRECISION, Product.ROUND_STRATEGY);
     }
 
-    public Product getProduct() {
-        return product;
+    public List<Product> getProducts() {
+        return products;
     }
 
     public ShipmentMethod getShipmentMethod() {
@@ -73,5 +85,13 @@ public class Order {
 
     public void setShipment(Shipment shipment) {
         this.shipment = shipment;
+    }
+
+    public BigDecimal getDiscount() {
+        return this.discount;
+    }
+
+    public void setDiscount(BigDecimal discount) {
+        this.discount = discount;
     }
 }
